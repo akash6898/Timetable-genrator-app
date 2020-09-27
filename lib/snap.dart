@@ -8,7 +8,8 @@ import 'package:excel/excel.dart';
 
 class Grid extends StatefulWidget {
   graphco g;
-  Grid(this.g);
+  int index = -1;
+  Grid(this.g, [this.index = -1]);
   @override
   _GridState createState() => _GridState();
 }
@@ -34,9 +35,28 @@ class _GridState extends State<Grid> {
 
   void generate() {
     List<String> _day = [];
+    Map<String, int> daytemp = {};
     List<int> _maxDays = [];
+    List<dynamic> table = [];
+    List<Map<String, dynamic>> _cname = [];
+    List<int> _modifiedIndex = [];
+    if (widget.index == -1) {
+      daytemp = widget.g.daytemp1;
+      table = List.from(widget.g.finaleTable);
+      _cname = List.from(widget.g.cname);
+      _modifiedIndex = List.from(widget.g.modifiedGraphIndex);
+    } else {
+      widget.g.timeTableList[widget.index]['day'].forEach((key, value) {
+        daytemp[key.toString()] = int.parse(value.toString());
+      });
+      table =
+          new List<dynamic>.from(widget.g.timeTableList[widget.index]['list']);
+      _cname = List.from(widget.g.timeTableList[widget.index]['courseList']);
+      _modifiedIndex =
+          List.from(widget.g.timeTableList[widget.index]['graphindex']);
+    }
     int max = 0;
-    widget.g.daytemp1.forEach((key, value) {
+    daytemp.forEach((key, value) {
       _day.add(key);
       if (value > max) {
         max = value;
@@ -44,9 +64,9 @@ class _GridState extends State<Grid> {
     });
     for (int i = 0; i < _day.length; i++) {
       int temp1 = 0;
-      for (int j = 0; j < widget.g.finaleTable[i].length; j++) {
-        if (widget.g.finaleTable[i][j].length > temp1) {
-          temp1 = widget.g.finaleTable[i][j].length;
+      for (int j = 0; j < table[i].length; j++) {
+        if (table[i][j].length > temp1) {
+          temp1 = table[i][j].length;
         }
       }
       _maxDays.add(temp1);
@@ -81,14 +101,14 @@ class _GridState extends State<Grid> {
           continue;
         }
         for (int no = 0; no < _maxDays[row - 1]; no++) {
-          if (widget.g.finaleTable[row - 1].length > (col - 1) &&
-              widget.g.finaleTable[row - 1][col - 1].length > no) {
+          if (table[row - 1].length > (col - 1) &&
+              table[row - 1][col - 1].length > no) {
             _temp1.add(Container(
               width: 100,
               height: 40,
               child: Center(
-                child: Text(widget.g.cname[widget.g.modifiedGraphIndex[
-                    widget.g.finaleTable[row - 1][col - 1][no]]]['name']),
+                child: Text(_cname[_modifiedIndex[table[row - 1][col - 1][no]]]
+                    ['name']),
               ),
               decoration: BoxDecoration(border: Border.all(width: 0.5)),
             ));

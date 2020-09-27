@@ -221,12 +221,17 @@ class graphco extends ChangeNotifier {
     }
     timeTableList.add({
       'name': tableName,
-      'start_time': startTime,
+      'start_time': startTime.toString(),
       'minute': minutes,
       'list': finaleTable,
       'day': daytemp1,
-      'created': TimeOfDay.now()
+      'created hr': TimeOfDay.now().toString(),
+      'courseList': cname,
+      'professerList': pname,
+      'graphindex': modifiedGraphIndex
     });
+    save();
+    notifyListeners();
     print(finaleTable);
   }
 

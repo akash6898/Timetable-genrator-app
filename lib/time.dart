@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'example.dart';
 import 'package:get/get.dart';
 import 'select.dart';
+import 'snap.dart';
 
 class Time extends StatelessWidget {
   graphco g;
@@ -22,7 +23,7 @@ class Time extends StatelessWidget {
               Get.to(Select(g));
             }),
       ),
-      body: g.finallist.length == 0
+      body: g.timeTableList.length == 0
           ? Center(
               child: Text("No TimeTable"),
             )
@@ -36,7 +37,10 @@ class Time extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.all(5),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        print(index);
+                        Get.to(Grid(g, index));
+                      },
                       dense: true,
                       leading: Icon(Icons.grid_on),
                       title: Text(
@@ -44,10 +48,7 @@ class Time extends StatelessWidget {
                         style: TextStyle(fontSize: 16),
                       ),
                       trailing: IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () async {
-                            // await edit(index);
-                          }),
+                          icon: Icon(Icons.edit), onPressed: () async {}),
                     ),
                   ),
                 );
