@@ -40,7 +40,7 @@ class Time extends StatelessWidget {
                       dense: true,
                       leading: Icon(Icons.grid_on),
                       title: Text(
-                        g.finallist[index]['name'],
+                        g.timeTableList[index]['name'],
                         style: TextStyle(fontSize: 16),
                       ),
                       trailing: IconButton(
@@ -52,7 +52,7 @@ class Time extends StatelessWidget {
                   ),
                 );
               },
-              itemCount: g.finallist.length,
+              itemCount: g.timeTableList.length,
             ),
     );
   }

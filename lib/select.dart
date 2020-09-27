@@ -75,8 +75,8 @@ class _SelectState extends State<Select> {
             onPressed: () {
               g.startTime = time;
               g.minutes = int.parse(_controller.text);
+              g.tableName = _controller1.text;
               g.solution();
-              g.addTime(_controller1.text);
               Get.off(Grid(g));
             },
             child: Text(

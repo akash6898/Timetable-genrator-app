@@ -14,11 +14,14 @@ class graphco extends ChangeNotifier {
   List<int> modifiedGraphIndex = new List();
   List<List<List<int>>> finaleTable = new List();
   List<Map<String, dynamic>> finallist = new List();
+  List<Map<String, dynamic>> timeTableList = new List();
   List<List<bool>> graph = [];
   List<List<int>> adj;
   int m;
+  int room = 2;
   TimeOfDay startTime;
   int minutes;
+  String tableName;
   List<int> result;
   List<String> pname = new List();
   Map<String, int> daytemp1 = {};
@@ -44,6 +47,7 @@ class graphco extends ChangeNotifier {
       print(jsonData);
       pname = new List.from(jsonData['name_of_p']);
       cname = new List.from(jsonData['name_of_c']);
+      timeTableList = new List.from(jsonData['time_table_list']);
     }
     return true;
   }
@@ -52,6 +56,7 @@ class graphco extends ChangeNotifier {
     Map<String, dynamic> jsonData = {
       'name_of_p': pname,
       'name_of_c': cname,
+      'time_table_list': timeTableList,
     };
     prefs.setString("data", json.encode(jsonData));
   }
@@ -69,7 +74,7 @@ class graphco extends ChangeNotifier {
   }
 
   void selectm(int x) {
-    m = x;
+    m = 1;
   }
 
   void addcname(String name, int index, int credit) {
@@ -177,12 +182,35 @@ class graphco extends ChangeNotifier {
       }
     });
     int index = 1;
+    List<List<int>> indexList = [];
+    for (int row = 1; row <= daytemp1.length; row++) {
+      List<int> _temp1 = [];
+      for (int col = 1; col <= daytemp[_daykeys[row - 1]]; col++) {
+        _temp1.add(0);
+      }
+      indexList.add(_temp1);
+    }
+    int _itemp = 1;
+    for (int j = 1; j <= max; j++) {
+      for (int i = 1; i <= daytemp1.length; i++) {
+        if (j <= daytemp[_daykeys[i - 1]]) {
+          indexList[i - 1][j - 1] = _itemp;
+          _itemp++;
+        }
+      }
+    }
+    for (int i = 0; i < indexList.length; i++) {
+      for (int j = 0; j < indexList[i].length; j++) {
+        print(indexList[i][j]);
+      }
+      print("next");
+    }
     for (int row = 1; row <= daytemp1.length; row++) {
       List<List<int>> _temp1 = [];
       for (int col = 1; col <= daytemp[_daykeys[row - 1]]; col++) {
         List<int> _temp = [];
         for (int i = 0; i < v; i++) {
-          if ((color[i] + 1) == index) {
+          if ((color[i] + 1) == indexList[row - 1][col - 1]) {
             _temp.add(i);
           }
         }
@@ -191,17 +219,20 @@ class graphco extends ChangeNotifier {
       }
       finaleTable.add(_temp1);
     }
+    timeTableList.add({
+      'name': tableName,
+      'start_time': startTime,
+      'minute': minutes,
+      'list': finaleTable,
+      'day': daytemp1,
+      'created': TimeOfDay.now()
+    });
     print(finaleTable);
   }
 
   addEdge(int v, int w) {
     adj[v].add(w);
     adj[w].add(v); // Note: the graph is undirected
-  }
-
-  void addTime(String name) {
-    finallist.add({'name': name, 'table': finaleTable});
-    notifyListeners();
   }
 
   void solution() {
@@ -264,7 +295,12 @@ class graphco extends ChangeNotifier {
     // value of available[cr] would mean that the color cr is
     // assigned to one of its adjacent vertices
     List<bool> available = new List(v);
-    for (int cr = 0; cr < v; cr++) available[cr] = false;
+    List<int> availableroom = new List(v);
+    for (int cr = 0; cr < v; cr++) {
+      available[cr] = false;
+      availableroom[cr] = 0;
+    }
+    availableroom[0] = 1;
 
     // Assign colors to remaining V-1 vertices
     for (int u = 1; u < v; u++) {
@@ -272,18 +308,35 @@ class graphco extends ChangeNotifier {
       // as unavailable
       int i;
 
-      for (i = 0; i != adj[u].length; ++i)
-        if (result[adj[u][i]] != -1) available[result[adj[u][i]]] = true;
+      for (i = 0; i != adj[u].length; ++i) {
+        if (result[adj[u][i]] != -1) {
+          available[result[adj[u][i]]] = true;
+        }
+      }
 
       // Find the first available color
       int cr;
-      for (cr = 0; cr < v; cr++) if (available[cr] == false) break;
-
-      result[u] = cr; // Assign the found color
+      int check = 0;
+      for (cr = 0; cr < v; cr++) {
+        if (available[cr] == false) {
+          if (availableroom[cr] < room) {
+            print("entered");
+            check = 1;
+            break;
+          }
+        }
+      }
+      if (check == 1) {
+        result[u] = cr;
+        availableroom[cr]++;
+      } // Assign the found color
 
       // Reset the values back to false for the next iteration
       for (i = 0; i != adj[u].length; ++i)
-        if (result[adj[u][i]] != -1) available[result[adj[u][i]]] = false;
+        if (result[adj[u][i]] != -1) {
+          available[result[adj[u][i]]] = false;
+          // availableroom[result[adj[u][i]]] = 0;
+        }
     }
 
     // print the result
