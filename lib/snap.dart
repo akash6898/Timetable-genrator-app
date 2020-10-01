@@ -33,6 +33,22 @@ class _GridState extends State<Grid> {
     );
   }
 
+  TimeOfDay plusMinutes(TimeOfDay time, int minutes) {
+    if (minutes == 0) {
+      return time;
+    } else {
+      int mofd = time.hour * 60 + time.minute;
+      int newMofd = ((minutes % 1440) + mofd + 1440) % 1440;
+      if (mofd == newMofd) {
+        return time;
+      } else {
+        int newHour = newMofd ~/ 60;
+        int newMinute = newMofd % 60;
+        return TimeOfDay(hour: newHour, minute: newMinute);
+      }
+    }
+  }
+
   void generate() {
     List<String> _day = [];
     Map<String, int> daytemp = {};
@@ -40,11 +56,15 @@ class _GridState extends State<Grid> {
     List<dynamic> table = [];
     List<Map<String, dynamic>> _cname = [];
     List<int> _modifiedIndex = [];
+    TimeOfDay startingTime;
+    int min;
     if (widget.index == -1) {
       daytemp = widget.g.daytemp1;
       table = List.from(widget.g.finaleTable);
       _cname = List.from(widget.g.cname);
       _modifiedIndex = List.from(widget.g.modifiedGraphIndex);
+      startingTime = widget.g.startTime;
+      min = widget.g.minutes;
     } else {
       widget.g.timeTableList[widget.index]['day'].forEach((key, value) {
         daytemp[key.toString()] = int.parse(value.toString());
@@ -54,6 +74,10 @@ class _GridState extends State<Grid> {
       _cname = List.from(widget.g.timeTableList[widget.index]['courseList']);
       _modifiedIndex =
           List.from(widget.g.timeTableList[widget.index]['graphindex']);
+      int hr = widget.g.timeTableList[widget.index]['hr'];
+      int mi = widget.g.timeTableList[widget.index]['mi'];
+      startingTime = TimeOfDay(hour: hr, minute: mi);
+      min = widget.g.timeTableList[widget.index]['minute'];
     }
     int max = 0;
     daytemp.forEach((key, value) {
@@ -62,6 +86,10 @@ class _GridState extends State<Grid> {
         max = value;
       }
     });
+    List<TimeOfDay> colName = [];
+    for (int i = 0; i <= max; i++) {
+      colName.add(plusMinutes(startingTime, min * i));
+    }
     for (int i = 0; i < _day.length; i++) {
       int temp1 = 0;
       for (int j = 0; j < table[i].length; j++) {
@@ -95,7 +123,9 @@ class _GridState extends State<Grid> {
           _temp1.add(Container(
             width: 100,
             height: 40,
-            child: Center(child: Text(col.toString())),
+            child: Center(
+                child: Text(
+                    "${colName[col - 1].hour.toString()}:${colName[col - 1].minute.toString()} - ${colName[col].hour.toString()}:${colName[col].minute.toString()}")),
             decoration: BoxDecoration(border: Border.all(width: 0.5)),
           ));
           continue;

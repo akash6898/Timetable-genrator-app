@@ -221,7 +221,8 @@ class graphco extends ChangeNotifier {
     }
     timeTableList.add({
       'name': tableName,
-      'start_time': startTime.toString(),
+      'hr': startTime.hour,
+      'mi': startTime.minute,
       'minute': minutes,
       'list': finaleTable,
       'day': daytemp1,
